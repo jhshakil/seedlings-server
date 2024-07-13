@@ -77,38 +77,4 @@ productSchema.statics.enableStock = async function (
   }
 };
 
-// productSchema.statics.isStockAvailable = async function (
-//   id: string,
-//   quantity: number,
-// ) {
-//   const availableStock = await Product.findOne({ _id: id });
-//   if (
-//     availableStock &&
-//     availableStock.inStock &&
-//     availableStock.quantity >= quantity
-//   ) {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// };
-
-// productSchema.statics.reduceQuantity = async function (
-//   id: string,
-//   quantity: number,
-// ) {
-//   const findProduct = await Product.findOne({ _id: id });
-//   if (findProduct && quantity <= findProduct.quantity) {
-//     await Product.updateOne(
-//       { _id: id },
-//       {
-//         $set: {
-//           quantity: findProduct.quantity - quantity,
-//           inStock: findProduct.quantity - quantity === 0 ? false : true,
-//         },
-//       },
-//     );
-//   }
-// };
-
 export const Product = model<TProduct, ProductModel>('Product', productSchema);
