@@ -59,6 +59,24 @@ productSchema.statics.reduceQuantity = async function (
     }
   }
 };
+
+productSchema.statics.enableStock = async function (
+  id: string,
+  quantity: number,
+) {
+  const findProduct = await Product.findOne({ _id: id });
+  if (findProduct && quantity >= findProduct.quantity) {
+    await Product.updateOne(
+      { _id: id },
+      {
+        $set: {
+          inStock: true,
+        },
+      },
+    );
+  }
+};
+
 // productSchema.statics.isStockAvailable = async function (
 //   id: string,
 //   quantity: number,

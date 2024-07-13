@@ -30,6 +30,7 @@ const updateProductIntoDB = async (id: string, product: Partial<TProduct>) => {
     { $set: product },
     { new: true },
   );
+  Product.enableStock(id, product.quantity as number);
   return result;
 };
 
