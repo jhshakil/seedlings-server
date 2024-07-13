@@ -1,3 +1,4 @@
+import { TOrderProduct } from '../order/order.interface';
 import { ProductModel, TProduct } from './product.interface';
 import { model, Schema } from 'mongoose';
 
@@ -24,37 +25,72 @@ productSchema.pre('findOne', function (next) {
 });
 
 productSchema.statics.isStockAvailable = async function (
-  id: string,
-  quantity: number,
+  products: TOrderProduct[],
 ) {
-  const availableStock = await Product.findOne({ _id: id });
-  if (
-    availableStock &&
-    availableStock.inStock &&
-    availableStock.quantity >= quantity
-  ) {
-    return true;
-  } else {
-    return false;
+  for (const x of products) {
+    const availableStock = await Product.findOne({ _id: x._id });
+    if (
+      availableStock &&
+      !availableStock.inStock &&
+      availableStock.quantity <= x.quantity
+    ) {
+      return false;
+    }
   }
+
+  return true;
 };
 
 productSchema.statics.reduceQuantity = async function (
-  id: string,
-  quantity: number,
+  products: TOrderProduct[],
 ) {
-  const findProduct = await Product.findOne({ _id: id });
-  if (findProduct && quantity <= findProduct.quantity) {
-    await Product.updateOne(
-      { _id: id },
-      {
-        $set: {
-          quantity: findProduct.quantity - quantity,
-          inStock: findProduct.quantity - quantity === 0 ? false : true,
+  for (const x of products) {
+    const findProduct = await Product.findOne({ _id: x._id });
+    if (findProduct && x.quantity <= findProduct.quantity) {
+      await Product.updateOne(
+        { _id: x._id },
+        {
+          $set: {
+            quantity: findProduct.quantity - x.quantity,
+            inStock: findProduct.quantity - x.quantity === 0 ? false : true,
+          },
         },
-      },
-    );
+      );
+    }
   }
 };
+// productSchema.statics.isStockAvailable = async function (
+//   id: string,
+//   quantity: number,
+// ) {
+//   const availableStock = await Product.findOne({ _id: id });
+//   if (
+//     availableStock &&
+//     availableStock.inStock &&
+//     availableStock.quantity >= quantity
+//   ) {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// };
+
+// productSchema.statics.reduceQuantity = async function (
+//   id: string,
+//   quantity: number,
+// ) {
+//   const findProduct = await Product.findOne({ _id: id });
+//   if (findProduct && quantity <= findProduct.quantity) {
+//     await Product.updateOne(
+//       { _id: id },
+//       {
+//         $set: {
+//           quantity: findProduct.quantity - quantity,
+//           inStock: findProduct.quantity - quantity === 0 ? false : true,
+//         },
+//       },
+//     );
+//   }
+// };
 
 export const Product = model<TProduct, ProductModel>('Product', productSchema);

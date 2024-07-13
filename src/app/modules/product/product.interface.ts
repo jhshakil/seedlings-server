@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
+import { TOrderProduct } from '../order/order.interface';
 
 export type TProduct = {
   title: string;
@@ -14,6 +15,6 @@ export type TProduct = {
 };
 
 export interface ProductModel extends Model<TProduct> {
-  isStockAvailable(id: string, quantity: number): Promise<boolean>;
-  reduceQuantity(id: string, quantity: number): void;
+  isStockAvailable(product: TOrderProduct[]): Promise<boolean>;
+  reduceQuantity(product: TOrderProduct[]): void;
 }
